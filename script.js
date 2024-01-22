@@ -52,6 +52,12 @@ let products = `[
         "name":"תופסן לקשית",
         "fullDescription": ".מתקן לתפיסת קשית. מקל על שתיה בקרב אנשים עם חולשה בידיים. מגיע במספר גדלים בהתאם לעובי דופן הכוס",
         "category": "אכילה ושתיה"
+    },
+{
+        "src": ["bernese-mountain-dog.jpg"],
+        "name":"כלב",
+        "fullDescription": "כלב חמוד מאוד",
+        "category": "עזרים"
     }
    
 
