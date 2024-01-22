@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <title>Product</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200&family=PT+Sans&family=Rubik:wght@300&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200&family=PT+Sans&family=Rubik:wght@300&family=Secular+One&display=swap" rel="stylesheet">
+
+</head>
+<body id="body-product">
+    <div id = "banner-product">
+        <h1 id = headline>קטלוג מוצרי תלת מימד- ריפוי בעיסוק</h1>
+        <img id = "logo" src = "Logo.png" alt="Levinstein Logo">
+    </div>
+    <div id = "product-container"> </div>
+   
+    <p id="product-full-description">full Description</p>
+    
+
+    <script>
+        // Retrieve the clicked image source and description from localStorage
+        const productContainer = document.getElementById('product-container');
+        const productFullDescription = document.getElementById('product-full-description');
+
+        const clickedImageSrcs = JSON.parse(localStorage.getItem('clickedImageSrc'));
+        console.log(clickedImageSrcs);
+        const clickedImageFullDescription = localStorage.getItem('clickedImageFullDescription');
+
+        if (clickedImageSrcs) {
+            clickedImageSrcs.forEach(imageSrc => {
+            const imgElement = document.createElement('img');
+            imgElement.src = imageSrc;
+            imgElement.alt = 'Product Image';
+            imgElement.classList.add('product-image'); // Add the product-image class
+            productContainer.appendChild(imgElement)
+        });
+        }
+        productFullDescription.textContent = clickedImageFullDescription;
+
+    </script>
+   
+</body>
+</html>
