@@ -496,7 +496,11 @@
     <div class="modal-backdrop" onclick="closeConfirm()"></div>
     <div class="confirm-panel">
         <p>האם אתה בטוח שברצונך למחוק את המוצר<br /><strong id="deleteProductName"></strong>?</p>
-        <p style="font-size:13px; color:#64748b; margin-bottom:20px;">לא ניתן לבטל פעולה זו.</p>
+        <p style="font-size:13px; color:#64748b; margin-bottom:16px;">לא ניתן לבטל פעולה זו.</p>
+        <label style="display:flex;align-items:center;gap:8px;justify-content:center;font-size:13px;margin-bottom:20px;cursor:pointer;">
+            <input type="checkbox" id="deleteImagesCheckbox" checked style="width:16px;height:16px;cursor:pointer;" />
+            מחק גם את קבצי התמונות מהמאגר
+        </label>
         <div class="confirm-btns">
             <button class="btn btn-ghost" onclick="closeConfirm()">ביטול</button>
             <button class="btn btn-danger" onclick="confirmDelete()">כן, מחק</button>

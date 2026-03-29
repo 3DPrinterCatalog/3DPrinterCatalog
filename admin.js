@@ -77,6 +77,23 @@ async function githubPut(path, body) {
     return res.json();
 }
 
+async function githubDelete(path, body) {
+    const res = await fetch(`${GITHUB_API}${path}`, {
+        method: 'DELETE',
+        headers: {
+            Authorization: authorizationHeader(),
+            Accept: 'application/vnd.github.v3+json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || `שגיאת GitHub API: ${res.status}`);
+    }
+    return res.json();
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Base64 helpers (support Hebrew / non-ASCII)
 // ─────────────────────────────────────────────────────────────────────────────
@@ -488,6 +505,7 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
 function openDeleteConfirm(index) {
     deleteTargetIndex = index;
     document.getElementById('deleteProductName').textContent = currentProducts[index].name;
+    document.getElementById('deleteImagesCheckbox').checked = true;
     document.getElementById('confirmDialog').classList.remove('hidden');
 }
 
@@ -496,16 +514,70 @@ function closeConfirm() {
     document.getElementById('confirmDialog').classList.add('hidden');
 }
 
+/**
+ * Returns filenames that are ONLY used by the product being deleted
+ * (not referenced by any other product) — these are safe to remove from the repo.
+ */
+function getOrphanedImages(deletedProduct) {
+    const remainingProducts = currentProducts.filter((_, i) => i !== deleteTargetIndex);
+    const usedElsewhere = new Set(
+        remainingProducts.flatMap(p => p.src || []).map(f => f.toLowerCase())
+    );
+    return (deletedProduct.src || []).filter(
+        f => !usedElsewhere.has(f.toLowerCase())
+    );
+}
+
+async function deleteImageFiles(filenames) {
+    const owner = getOwner();
+    const repo  = getRepo();
+    const deleted = [];
+    const failed  = [];
+
+    for (const filename of filenames) {
+        const apiPath = `/repos/${owner}/${repo}/contents/${encodeURIComponent(filename)}`;
+        try {
+            const fileData = await githubGet(apiPath);
+            await githubDelete(apiPath, {
+                message: `מחיקת תמונה: ${filename}`,
+                sha: fileData.sha,
+            });
+            deleted.push(filename);
+        } catch (err) {
+            failed.push(filename);
+            console.warn(`לא ניתן למחוק "${filename}":`, err.message);
+        }
+    }
+    return { deleted, failed };
+}
+
 async function confirmDelete() {
     if (deleteTargetIndex === -1) return;
-    const idx = deleteTargetIndex;
+    const idx            = deleteTargetIndex;
+    const product        = currentProducts[idx];
+    const alsoDelImages  = document.getElementById('deleteImagesCheckbox').checked;
+    const orphaned       = alsoDelImages ? getOrphanedImages(product) : [];
+
     closeConfirm();
     setLoading(true);
     try {
+        // 1. Remove from products array and save JSON first
         currentProducts.splice(idx, 1);
         await saveProducts();
+
+        // 2. Delete orphaned image files (only files not used by other products)
+        let imageNote = '';
+        if (orphaned.length > 0) {
+            const { deleted, failed } = await deleteImageFiles(orphaned);
+            if (failed.length > 0) {
+                imageNote = ` (${failed.length} תמונ${failed.length === 1 ? 'ה' : 'ות'} לא נמחק${failed.length === 1 ? 'ה' : 'ו'} מהמאגר)`;
+            } else if (deleted.length > 0) {
+                imageNote = ` + ${deleted.length} תמונ${deleted.length === 1 ? 'ה' : 'ות'} נמחק${deleted.length === 1 ? 'ה' : 'ו'}`;
+            }
+        }
+
         renderProductGrid();
-        showToast('🗑️ המוצר נמחק בהצלחה');
+        showToast(`🗑️ המוצר נמחק בהצלחה${imageNote}`);
     } catch (err) {
         showToast(`שגיאה במחיקה: ${err.message}`, 'error');
         await loadProducts().catch(() => {});
