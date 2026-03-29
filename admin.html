@@ -370,6 +370,15 @@
             </ol>
         </div>
 
+        <div class="instructions-box" style="background:#fffbeb; border-color:#fcd34d;">
+            <h3>⚠️ משתמשים ב-Fine-grained token (מתחיל ב־<code>github_pat_</code>)?</h3>
+            <ol style="margin-top:8px;">
+                <li>ב<strong>Repository access</strong> — בחר את המאגר <strong>3DPrinterCatalog</strong> (או &quot;All repositories&quot;).</li>
+                <li>ב<strong>Repository permissions</strong> → <strong>Contents</strong> — חובה: <strong>Read and write</strong> (לא רק Read).</li>
+                <li>בלי הרשאת כתיבה ל-Contents תופיע השגיאה: &quot;Resource not accessible by personal access token&quot;.</li>
+            </ol>
+        </div>
+
         <div class="security-note">
             🔒 הטוקן נשמר בדפדפן שלך בלבד ולא נשלח לאף שרת חיצוני. כל שינוי בקטלוג מתבצע ישירות מול GitHub.
         </div>
@@ -387,8 +396,8 @@
             </div>
             <div class="field">
                 <label>טוקן גישה (Personal Access Token)</label>
-                <input id="tokenInput" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="current-password" required />
-                <small>הטוקן יישמר בדפדפן שלך בלבד ויאפשר לך לערוך את הקטלוג</small>
+                <input id="tokenInput" type="password" placeholder="ghp_… או github_pat_…" autocomplete="current-password" required />
+                <small>אין לשים את הטוקן בקוד — רק כאן בכניסה. נשמר בדפדפן שלך בלבד.</small>
             </div>
 
             <div id="loginError" class="error-msg hidden"></div>

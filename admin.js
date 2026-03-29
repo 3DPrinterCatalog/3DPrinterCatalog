@@ -37,11 +37,19 @@ function clearCredentials() {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // GitHub REST API helpers
+// Fine-grained PATs (github_pat_*) must use "Bearer"; classic PATs (ghp_) use "token".
+// See: https://docs.github.com/en/rest/authentication/authenticating-to-the-rest-api
 // ─────────────────────────────────────────────────────────────────────────────
+function authorizationHeader() {
+    const t = getToken();
+    if (!t) return '';
+    return t.startsWith('github_pat_') ? `Bearer ${t}` : `token ${t}`;
+}
+
 async function githubGet(path) {
     const res = await fetch(`${GITHUB_API}${path}`, {
         headers: {
-            Authorization: `token ${getToken()}`,
+            Authorization: authorizationHeader(),
             Accept: 'application/vnd.github.v3+json',
         },
     });
@@ -56,7 +64,7 @@ async function githubPut(path, body) {
     const res = await fetch(`${GITHUB_API}${path}`, {
         method: 'PUT',
         headers: {
-            Authorization: `token ${getToken()}`,
+            Authorization: authorizationHeader(),
             Accept: 'application/vnd.github.v3+json',
             'Content-Type': 'application/json',
         },
