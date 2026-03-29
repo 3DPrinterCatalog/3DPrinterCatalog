@@ -24,25 +24,33 @@
     
 
     <script>
-        // Retrieve the clicked image source and description from localStorage
         const productContainer = document.getElementById('product-container');
         const productFullDescription = document.getElementById('product-full-description');
 
-        const clickedImageSrcs = JSON.parse(localStorage.getItem('clickedImageSrc'));
-        console.log(clickedImageSrcs);
+        let clickedImageSrcs = null;
+        try {
+            const raw = localStorage.getItem('clickedImageSrc');
+            if (raw) clickedImageSrcs = JSON.parse(raw);
+        } catch (e) {
+            console.error('שגיאה בטעינת נתוני מוצר:', e);
+        }
+
         const clickedImageFullDescription = localStorage.getItem('clickedImageFullDescription');
 
-        if (clickedImageSrcs) {
+        if (clickedImageSrcs && clickedImageSrcs.length > 0) {
             clickedImageSrcs.forEach(imageSrc => {
-            const imgElement = document.createElement('img');
-            imgElement.src = imageSrc;
-            imgElement.alt = 'Product Image';
-            imgElement.classList.add('product-image'); // Add the product-image class
-            productContainer.appendChild(imgElement)
-        });
+                const imgElement = document.createElement('img');
+                imgElement.src = imageSrc;
+                imgElement.alt = 'Product Image';
+                imgElement.classList.add('product-image');
+                productContainer.appendChild(imgElement);
+            });
+        } else {
+            productContainer.innerHTML =
+                '<p style="color:#64748b;text-align:center;padding:40px 0">לא נמצאו פרטי מוצר. <a href="index.html">חזור לקטלוג</a> ובחר מוצר.</p>';
         }
-        productFullDescription.textContent = clickedImageFullDescription;
 
+        productFullDescription.textContent = clickedImageFullDescription || '';
     </script>
    
 </body>

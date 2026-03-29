@@ -257,24 +257,29 @@ function renderProductGrid() {
     // Placeholder SVG shown when image fails to load
     const placeholderSvg = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='80' height='80' fill='%23f1f5f9'/%3E%3Ctext x='40' y='46' text-anchor='middle' fill='%2394a3b8' font-size='10' font-family='Arial'%3Eאין תמונה%3C/text%3E%3C/svg%3E`;
 
-    grid.innerHTML = currentProducts.map((p, i) => `
+    grid.innerHTML = currentProducts.map((p, i) => {
+        const thumb    = p.src && p.src[0] ? escHtml(p.src[0]) : '';
+        const desc     = p.fullDescription || '';
+        const imgCount = p.src ? p.src.length : 0;
+        return `
         <div class="product-card">
             <div class="product-thumb">
-                <img src="${escHtml(p.src[0])}" alt="${escHtml(p.name)}"
+                <img src="${thumb}" alt="${escHtml(p.name)}"
                      onerror="this.src='${placeholderSvg}'" />
             </div>
             <div class="product-info">
                 <strong>${escHtml(p.name)}</strong>
                 <span class="category-badge">${escHtml(p.category || '')}</span>
-                <p class="product-desc-preview">${escHtml(p.fullDescription.substring(0, 90))}${p.fullDescription.length > 90 ? '…' : ''}</p>
-                <div class="card-imgs-count">${p.src.length} תמונ${p.src.length === 1 ? 'ה' : 'ות'}</div>
+                <p class="product-desc-preview">${escHtml(desc.substring(0, 90))}${desc.length > 90 ? '…' : ''}</p>
+                <div class="card-imgs-count">${imgCount} תמונ${imgCount === 1 ? 'ה' : 'ות'}</div>
             </div>
             <div class="product-actions">
                 <button class="btn-edit" onclick="openEditModal(${i})">✏️ ערוך</button>
                 <button class="btn-del"  onclick="openDeleteConfirm(${i})">🗑️ מחק</button>
             </div>
         </div>
-    `).join('');
+    `;
+    }).join('');
 }
 
 function escHtml(str) {
@@ -438,6 +443,8 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
         return;
     }
 
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
     setLoading(true);
     try {
         // 1. Upload all new images first
@@ -470,6 +477,7 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
         // Revert local change if save failed
         await loadProducts().catch(() => {});
     } finally {
+        submitBtn.disabled = false;
         setLoading(false);
     }
 });

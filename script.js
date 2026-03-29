@@ -104,7 +104,9 @@ document.querySelectorAll('.cataloug img').forEach(image => {
 
 document.querySelectorAll('.nameOfProduct').forEach(nameEl => {
     nameEl.addEventListener('click', function () {
-        const product = allProducts.find(p => p.name === this.textContent);
+        const i = parseInt(this.id.replace('name-bellow-image', ''));
+        const idx = i + 9 * pageNumber;
+        const product = productsJSON[idx];
         if (product) {
             localStorage.setItem('clickedImageSrc', JSON.stringify(product.src));
             localStorage.setItem('clickedImageFullDescription', product.fullDescription);
