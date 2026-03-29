@@ -91,27 +91,28 @@ document.getElementById('prev').addEventListener('click', () => {
     }
 });
 
-document.querySelectorAll('.cataloug img').forEach(image => {
-    image.addEventListener('click', function () {
-        const idx = parseInt(image.id.split('image')[1]) + 9 * pageNumber;
-        const product = productsJSON[idx];
-        if (product) {
-            localStorage.setItem('clickedImageSrc', JSON.stringify(product.src));
-            localStorage.setItem('clickedImageFullDescription', product.fullDescription);
-        }
-    });
-});
+// One handler: empty slots must not navigate to product.html (would show stale localStorage from old visits)
+document.querySelector('.cataloug').addEventListener('click', function (e) {
+    const a = e.target.closest('a[href="product.html"]');
+    if (!a) return;
 
-document.querySelectorAll('.nameOfProduct').forEach(nameEl => {
-    nameEl.addEventListener('click', function () {
-        const i = parseInt(this.id.replace('name-bellow-image', ''));
-        const idx = i + 9 * pageNumber;
-        const product = productsJSON[idx];
-        if (product) {
-            localStorage.setItem('clickedImageSrc', JSON.stringify(product.src));
-            localStorage.setItem('clickedImageFullDescription', product.fullDescription);
-        }
-    });
+    const container = a.closest('[class*="image-container"]');
+    if (!container) return;
+
+    const m = container.className.match(/image-container(\d)/);
+    if (!m) return;
+
+    const slot = parseInt(m[1], 10);
+    const idx = slot + pageNumber * 9;
+    const product = productsJSON[idx];
+
+    if (!product) {
+        e.preventDefault();
+        return;
+    }
+
+    localStorage.setItem('clickedImageSrc', JSON.stringify(product.src));
+    localStorage.setItem('clickedImageFullDescription', product.fullDescription);
 });
 
 document.addEventListener('DOMContentLoaded', loadAndInit);
